@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!--    加载数据库配置文件-->
+    <properties resource="db.properties"/>
+    <!--settings :控制mybatis的全局行为-->
+    <settings>
+        <!--设置mybatis输出日志 -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <!--url【换成自己数据库的库名】-->
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--sql  mapper(sql映射文件)的位置-->
+    <mappers>
+        <!--mapper可以有多个【这里需要自己填】-->
+        <!-- <mapper resource="com/.../dao/**.xml"></mapper>-->
+        <!--批量注册一个包下面的所有xml文件-->
+         <package name="com.xiefuzhong.crm.settings.dao"/>
+        <package name="com.xiefuzhong.crm.workbench.dao"/>
+
+    </mappers>
+</configuration>
