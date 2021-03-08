@@ -104,9 +104,20 @@
 				success : function (data) {
 					if (data.success){
 						//添加成功后  要刷新市场活动信息列表（局部刷新）
-						pageList(1,2);
-
-						
+						// pageList(1,2);
+						/**
+						 *
+						 *$("#activityPage").bs_pagination('getOption','currentPage')
+						 * 	操作后停留在当前页
+						 * $("#activityPage").bs_pagination('getOption','rowsPerPage')
+						 * 	操作后维持已经设置好的每页展现的记录数
+						 *
+						 * 	这两个参数不需要我们进行任何的修改操作
+						 * 		直接使用即可
+						*/
+						//做完添加操作后，应该回到第一页，维持每页展现的记录数
+						pageList(1
+						,$("#activityPage").bs_pagination('getOption','rowsPerPage'));
 						/*
 						jquery中没有为我们提供reset方法，但是原生js为我们提供了reset方法
 						所以我们要将jQuery对象转换为原生dom对象
@@ -207,7 +218,10 @@
 							//		{"success":true/false}
 							if (data.success){
 								//删除成功后需要刷新市场活动列表
-								pageList(1,2);
+								//回到第一页，维持每一页展现数
+								//pageList(1,2);
+								pageList(1
+										,$("#activityPage").bs_pagination('getOption','rowsPerPage'));
 							}else {
 								alert("删除市场活动列表失败");
 							}
@@ -283,7 +297,7 @@
 					"name":$.trim($("#edit-name").val()),
 					"startDate":$.trim($("#edit-startDate").val()),
 					"endDate":$.trim($("#edit-endDate").val()),
-					"cost":$.trim($("#create-cost").val()),
+					"cost":$.trim($("#edit-cost").val()),
 					"description":$.trim($("#edit-description").val())
 				},
 				type: "post",
@@ -291,9 +305,12 @@
 				success : function (data) {
 					if (data.success){
 						//修改成功后  要刷新市场活动信息列表（局部刷新）
-						pageList(1,2);
-
-
+						// pageList(1,2);
+						/*
+						 修改操作后，应该维持在当前页，维持每页展现的记录数
+						 */
+						 pageList($("#activityPage").bs_pagination('getOption','currentPage')
+						 ,$("#activityPage").bs_pagination('getOption','rowsPerPage'));
 						//关闭修改操作的模态窗口
 						$("#editActivityModal").modal("hide");
 
@@ -362,7 +379,7 @@
 					$.each(data.dataList,function (i,n) {
 							html += '<tr class="active"> ';
 							html += '<td><input type="checkbox"  name="xz"  value="'+n.id+'"/></td> ';
-							html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.jsp\';">'+n.name+'</a></td>';
+							html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.do?id='+n.id+'\';">'+n.name+'</a></td>';
 							html += '<td>'+n.owner+'</td>';
 							html += '<td>'+n.startDate+'</td>';
 							html += '<td>'+n.endDate+'</td>';
@@ -551,7 +568,7 @@
 	<div>
 		<div style="position: relative; left: 10px; top: -10px;">
 			<div class="page-header">
-				<h3>市场活动列表1233</h3>
+				<h3>市场活动列表</h3>
 			</div>
 		</div>
 	</div>

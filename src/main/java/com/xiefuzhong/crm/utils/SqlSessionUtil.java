@@ -27,7 +27,7 @@ public class SqlSessionUtil {
 		 new SqlSessionFactoryBuilder().build(inputStream);
 		
 	}
-	
+	// 解决资源争抢问题.
 	private static ThreadLocal<SqlSession> t = new ThreadLocal<SqlSession>();
 	
 	public static SqlSession getSqlSession(){

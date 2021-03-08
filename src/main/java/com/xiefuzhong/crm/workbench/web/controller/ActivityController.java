@@ -8,6 +8,7 @@ import com.xiefuzhong.crm.workbench.domain.Activity;
 import com.xiefuzhong.crm.workbench.service.ActivityService;
 import com.xiefuzhong.crm.workbench.service.impl.ActivityServiceImpl;
 import com.xiefuzhong.crm.workbench.vo.PaginationVo;
+import org.apache.ibatis.reflection.SystemMetaObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,7 +46,24 @@ public class ActivityController extends HttpServlet {
         }else  if("/workbench/activity/update.do".equals(path)){
             update(request,response);
 
+        }else  if("/workbench/activity/detail.do".equals(path)){
+            detail(request,response);
+
         }
+    }
+
+    private void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("进入到跳转到详细信息页的操作,使用传统请求方式");
+        String id = request.getParameter("id");
+       ActivityService as= (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+       Activity a =as.detail(id);
+       //使用传统方式来实现功能，使用转发或者重定向的方式
+        //使用request域就足够来存数据
+        // 想要使用er表达式取request域取值就必须要用转发
+        // 路径写法不用/项目名，因为是内部路径
+        request.setAttribute("a",a);
+        request.getRequestDispatcher("/workbench/activity/detail.jsp").forward(request,response);
+
     }
 
     private void update(HttpServletRequest request, HttpServletResponse response) {
