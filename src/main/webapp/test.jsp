@@ -26,13 +26,12 @@
             dataType : "json",
             success : function (data) {
 
-
 }
 })
 
 
     //创建时间,当前的系统时间
-    String reateTime = DateTimeUtil.getSysTime();
+    String createTime = DateTimeUtil.getSysTime();
     //从session域中获取当前登录用户
     String createBy =((User)request.getSession().getAttribute("user")).getName();
 </body>
