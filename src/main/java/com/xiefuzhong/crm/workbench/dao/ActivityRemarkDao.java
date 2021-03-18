@@ -17,4 +17,6 @@ public interface ActivityRemarkDao {
     int deleteRemarkById(String id);
 
     int saveRemark(ActivityRemark ar);
+
+    int updateRemark(ActivityRemark ar);
 }

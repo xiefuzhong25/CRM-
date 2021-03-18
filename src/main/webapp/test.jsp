@@ -26,8 +26,8 @@
             dataType : "json",
             success : function (data) {
 
-}
-})
+             }
+    })
 
 
     //创建时间,当前的系统时间

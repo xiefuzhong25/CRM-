@@ -59,7 +59,39 @@ public class ActivityController extends HttpServlet {
         }else  if("/workbench/activity/saveRemark.do".equals(path)){
             saveRemark(request,response);
 
+        }else  if("/workbench/activity/updateRemark.do".equals(path)){
+            updateRemark(request,response);
+
         }
+
+
+    }
+
+    private void updateRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("进入到编辑修改备注的模态窗口");
+
+        String id = request.getParameter("id");
+        String  noteContent = request.getParameter("noteContent");
+        String editTime = DateTimeUtil.getSysTime();
+        String editBy =((User)request.getSession().getAttribute("user")).getName();
+        String editFlag = "1";
+
+        ActivityRemark ar =  new ActivityRemark();
+        ar.setId(id);
+        ar.setNoteContent(noteContent);
+        ar.setEditTime(editTime);
+        ar.setEditBy(editBy);
+        ar.setEditFlag(editFlag);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        boolean  flag =  as.updateRemark(ar);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("success",flag);
+        map.put("ar",ar);
+
+        PrintJson.printJsonObj(response,map);
     }
 
     private void saveRemark(HttpServletRequest request, HttpServletResponse response) {
@@ -79,6 +111,7 @@ public class ActivityController extends HttpServlet {
         ar.setId(id);
         ar.setCreateTime(createTime);
         ar.setEditBy(createBy);
+        ar.setCreateBy(createBy);
         ar.setEditFlag(editFlag);
 
          ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
