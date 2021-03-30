@@ -6,6 +6,7 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+    
 <!--过滤器-->
     <!--过滤字符乱码-->
     <filter>
@@ -26,7 +27,14 @@
         <url-pattern>*.do</url-pattern>
         <url-pattern>*.jsp</url-pattern>
     </filter-mapping>
-
+    
+<!--监听器[一帮配到filter后面最好]-->
+    <listener>
+        <listener-class>com.xiefuzhong.crm.web.listener.SysInitListener</listener-class>
+    </listener>
+    
+    
+    
 <!--用户控制器-->
     <servlet>
     <servlet-name>UserController</servlet-name>
@@ -56,6 +64,21 @@
         <url-pattern>/workbench/activity/deleteRemark.do</url-pattern>
         <url-pattern>/workbench/activity/saveRemark.do</url-pattern>
         <url-pattern>/workbench/activity/updateRemark.do</url-pattern>
+
+    </servlet-mapping>
+
+
+    <!--线索控制器-->
+    <servlet>
+        <servlet-name>ClueController</servlet-name>
+        <servlet-class>com.xiefuzhong.crm.workbench.web.controller.ClueController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ClueController</servlet-name>
+        <url-pattern>/workbench/clue/getUserList.do</url-pattern>
+        <url-pattern>/workbench/clue/save.do</url-pattern>
+        <url-pattern>/workbench/clue/pageList.do</url-pattern>
+        <url-pattern>/workbench/clue/detail.do</url-pattern>
 
 
 
