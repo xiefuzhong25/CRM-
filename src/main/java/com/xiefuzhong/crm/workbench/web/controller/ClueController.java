@@ -7,6 +7,7 @@ import com.xiefuzhong.crm.utils.*;
 import com.xiefuzhong.crm.workbench.domain.Activity;
 import com.xiefuzhong.crm.workbench.domain.ActivityRemark;
 import com.xiefuzhong.crm.workbench.domain.Clue;
+import com.xiefuzhong.crm.workbench.domain.ClueActivityRelation;
 import com.xiefuzhong.crm.workbench.service.ActivityService;
 import com.xiefuzhong.crm.workbench.service.ClueService;
 import com.xiefuzhong.crm.workbench.service.impl.ActivityServiceImpl;
@@ -43,7 +44,73 @@ public class ClueController extends HttpServlet {
         }else  if("/workbench/clue/detail.do".equals(path)){
             detail(request,response);
 
+        }else  if("/workbench/clue/getActivityListByClueId.do".equals(path)){
+            getActivityListByClueId(request,response);
+
+        }else  if("/workbench/clue/unbundById.do".equals(path)){
+            unbundById(request,response);
+
+        }else  if("/workbench/clue/getActivityListByNameAndNotByClueId.do".equals(path)){
+            getActivityListByNameAndNotByClueId(request,response);
+
+        }else  if("/workbench/clue/bund.do".equals(path)){
+            bund(request,response);
+
         }
+
+    }
+
+    private void bund(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("进入到关联市场活动功能按钮事件");
+
+        String cid = request.getParameter("cid");
+        //存一个数组变量
+        String[] aids = request.getParameterValues("aid");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+        boolean flag= cs.bund(cid,aids);
+        PrintJson.printJsonFlag(response,flag);
+
+
+    }
+
+    private void getActivityListByNameAndNotByClueId(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("查询市场活动列表，（根据名称模糊查询+排除掉已经关联指定线索的列表）");
+
+        String  aname = request.getParameter("aname");
+        String  clueId = request.getParameter("clueId");
+
+        Map<String,String> map = new HashMap<>();
+        map.put("aname",aname);
+        map.put("clueId",clueId);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        List<Activity> aList = as.getActivityListByNameAndNotByClueId(map);
+        PrintJson.printJsonObj(response,aList);
+
+    }
+
+
+    private void unbundById(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("解除关联操作");
+        String id =  request.getParameter("id");
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+         boolean flag = cs.unbundById(id);
+         PrintJson.printJsonFlag(response,flag);
+
+    }
+
+    private void getActivityListByClueId(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("进入到市场活动关联功能");
+
+        String clueId = request.getParameter("clueId");
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        List<Activity> aList = as.getActivityListByClueId(clueId);
+        PrintJson.printJsonObj(response,aList);
 
     }
 

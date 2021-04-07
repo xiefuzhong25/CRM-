@@ -3,9 +3,12 @@ package com.xiefuzhong.crm.workbench.service.impl;
 import com.xiefuzhong.crm.settings.dao.UserDao;
 import com.xiefuzhong.crm.settings.domain.User;
 import com.xiefuzhong.crm.utils.SqlSessionUtil;
+import com.xiefuzhong.crm.utils.UUIDUtil;
+import com.xiefuzhong.crm.workbench.dao.ClueActivityRelationDao;
 import com.xiefuzhong.crm.workbench.dao.ClueDao;
 import com.xiefuzhong.crm.workbench.domain.Activity;
 import com.xiefuzhong.crm.workbench.domain.Clue;
+import com.xiefuzhong.crm.workbench.domain.ClueActivityRelation;
 import com.xiefuzhong.crm.workbench.service.ClueService;
 import com.xiefuzhong.crm.workbench.vo.PaginationVo;
 
@@ -16,6 +19,7 @@ import java.util.Map;
 public class ClueServiceImpl implements ClueService {
 
     private ClueDao clueDao = SqlSessionUtil.getSqlSession().getMapper(ClueDao.class);
+    private ClueActivityRelationDao clueActivityRelationDao = SqlSessionUtil.getSqlSession().getMapper(ClueActivityRelationDao.class);
 
 
     @Override
@@ -47,5 +51,32 @@ public class ClueServiceImpl implements ClueService {
     public Clue detail(String id) {
         Clue c = clueDao.detail(id);
         return c;
+    }
+
+    @Override
+    public boolean unbundById(String id) {
+        boolean flag = true;
+         int count = clueActivityRelationDao.unbundById(id);
+         if (count!=1){
+             flag=false;
+         }
+        return flag;
+    }
+
+    @Override
+    public boolean bund(String cid, String[] aids) {
+        boolean flag = true;
+        for (String aid:aids){
+            //取得每一个aid和cid做关联
+            ClueActivityRelation car = new ClueActivityRelation();
+            car.setActivityId(aid);
+            car.setClueId(cid);
+            car.setId(UUIDUtil.getUUID());
+            int count = clueActivityRelationDao.bund(car);
+            if (count!=1){
+                flag = false;
+            }
+        }
+        return flag;
     }
 }

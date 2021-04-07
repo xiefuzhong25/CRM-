@@ -52,7 +52,169 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		$(".myHref").mouseout(function(){
 			$(this).children("span").css("color","#E6E6E6");
 		});
+
+//为部分属性绑定事件
+
+		//页面加载完毕后，取出关联的市场活动信息列表
+		showActivityList();
+
+		//为关联市场活动模块窗口中的 搜索框  绑定事件，通过触发回车键，查询并且展示所需市场活动列表
+		$("#aname").keydown(function (event) {
+
+			//如果是回车键
+			if (event.keyCode==13){
+
+				// alert("查询并展现市场活动列表")，因为发现按回车后会触发模态窗口磨人的刷新功能，所以应该禁用它
+				$.ajax({
+					url:"workbench/clue/getActivityListByNameAndNotByClueId.do",
+					data : {
+						"aname":$.trim($("#aname").val()),
+						"clueId" : "${c.id}"
+
+					},
+					type : "get",
+					dataType : "json",
+					success : function (data) {
+						var html="";
+						$.each(data,function (i,n) {
+
+							html += '<tr>';
+							html += '<td><input type="checkbox"  name="xz" value="'+n.id+'"/></td>';
+							html += '<td>'+n.name+'</td>';
+							html += '<td>'+n.startDate+'</td>';
+							html += '<td>'+n.endDate+'</td>';
+							html += '<td>'+n.owner+'</td>';
+							html += '</tr>';
+
+						})
+						$("#activitySearchBody").html(html);
+					}
+				})
+
+				//展现完列表后，记得将模态窗口默认的回车行为禁用掉
+				return false;
+			}
+		})
+
+
+		//为全选按钮绑定事件
+		$("#qx").click(function () {
+			$("input[name=xz]").prop("checked",this.checked);
+
+		})
+
+		//为关联按钮绑定事件
+		$("#bundBtn").click(function () {
+			var $xz = $("input[name]:checked");
+			if ($xz.length==0){
+				alert("请选择需要关联的市场活动");
+
+			}else{
+				//选有一条或者多条
+
+				// workbench/clue/bund.do?cid=xxx&aid=xxx&aid=xxx
+				var param = "cid=${c.id}&";
+				for (var i=0;i<$xz.length;i++){
+					//把每个dom对象包装成jquery对象$($xz[i])
+					param += "aid="+$($xz[i]).val();
+					if (i<$xz.length-1){
+						param += "&";
+					}
+				}
+				$.ajax({
+					url:"workbench/clue/bund.do",
+					data :param,
+					type : "post",
+					dataType : "json",
+					success : function (data) {
+						if (data.success){
+
+							//清楚文本框里的东西  复选框中的√去掉  清空activitySearchBody中的内容
+							$("#aname").val("");
+								//重置全选按钮
+							$("#qx").prop("checked",false);
+							$("#activitySearchBody").html("");
+							//刷新活动列表
+							showActivityList();
+
+
+							//关闭模态窗口
+							$("#bundModal").modal("hide");
+						}else{
+							alert("关联市场活动失败");
+						}
+
+					}
+				})
+
+			}
+
+		})
+
+
 	});
+
+//定义各种功能函数
+	function showActivityList() {
+		$.ajax({
+			url:"workbench/clue/getActivityListByClueId.do",
+			data :{
+				"clueId" : "${c.id}"
+			} ,
+			type : "get",
+			dataType : "json",
+			success : function (data) {
+				/*
+				data:
+					【{市场活动1},{市场活动2}】
+				 */
+				var html = "";
+				$.each(data,function (i,n) {
+
+					html += '<tr>';
+					html += '<td>'+n.name+'</td>';
+					html += '<td>'+n.startDate+'</td>';
+					html += '<td>'+n.endDate+'</td>';
+					html += '<td>'+n.owner+'</td>';
+					html += '<td><a href="javascript:void(0);"  onclick="unbund(\''+n.id+'\')" style="text-decoration: none; "><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>';
+					html += '</tr>';
+
+				})
+				$("#activityBody").html(html);
+			}
+
+		})
+
+
+
+
+	}
+
+	function unbund(id) {
+
+		$.ajax({
+			url:"workbench/clue/unbundById.do",
+			data :{
+				"id" :id
+
+			} ,
+			type : "get",
+			dataType : "json",
+			success : function (data) {
+				if (data.success){
+					//刷新市场活动
+					showActivityList();
+				}else{
+					alert("解除关联失败");
+				}
+
+			}
+		})
+
+
+
+	}
+
 	
 </script>
 
@@ -73,7 +235,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div class="btn-group" style="position: relative; top: 18%; left: 8px;">
 						<form class="form-inline" role="form">
 						  <div class="form-group has-feedback">
-						    <input type="text" class="form-control" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
+						    <input type="text" class="form-control"  id="aname" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
 						    <span class="glyphicon glyphicon-search form-control-feedback"></span>
 						  </div>
 						</form>
@@ -81,7 +243,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<table id="activityTable" class="table table-hover" style="width: 900px; position: relative;top: 10px;">
 						<thead>
 							<tr style="color: #B3B3B3;">
-								<td><input type="checkbox"/></td>
+								<td><input type="checkbox" id="qx"/></td>
 								<td>名称</td>
 								<td>开始日期</td>
 								<td>结束日期</td>
@@ -89,27 +251,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td></td>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
-								<td><input type="checkbox"/></td>
-								<td>发传单</td>
-								<td>2020-10-10</td>
-								<td>2020-10-20</td>
-								<td>zhangsan</td>
-							</tr>
-							<tr>
-								<td><input type="checkbox"/></td>
-								<td>发传单</td>
-								<td>2020-10-10</td>
-								<td>2020-10-20</td>
-								<td>zhangsan</td>
-							</tr>
+						<tbody id="activitySearchBody">
+
+
 						</tbody>
 					</table>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">关联</button>
+					<button type="button" class="btn btn-primary" id="bundBtn">关联</button>
 				</div>
 			</div>
 		</div>
@@ -434,27 +584,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<td></td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td>发传单</td>
-							<td>2020-10-10</td>
-							<td>2020-10-20</td>
-							<td>zhangsan</td>
-							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-						</tr>
-						<tr>
-							<td>发传单</td>
-							<td>2020-10-10</td>
-							<td>2020-10-20</td>
-							<td>zhangsan</td>
-							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-						</tr>
+					<tbody id="activityBody">
+
 					</tbody>
 				</table>
 			</div>
 			
 			<div>
-				<a href="javascript:void(0);" data-toggle="modal" data-target="#bundModal" style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>关联市场活动</a>
+				<a href="javascript:void(0);"  data-toggle="modal"  data-target="#bundModal"  style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>关联市场活动</a>
 			</div>
 		</div>
 	</div>
