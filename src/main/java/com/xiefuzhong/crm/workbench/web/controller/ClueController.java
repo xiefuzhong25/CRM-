@@ -4,10 +4,7 @@ import com.xiefuzhong.crm.settings.domain.User;
 import com.xiefuzhong.crm.settings.service.UserService;
 import com.xiefuzhong.crm.settings.service.impl.UserServiceImpl;
 import com.xiefuzhong.crm.utils.*;
-import com.xiefuzhong.crm.workbench.domain.Activity;
-import com.xiefuzhong.crm.workbench.domain.ActivityRemark;
-import com.xiefuzhong.crm.workbench.domain.Clue;
-import com.xiefuzhong.crm.workbench.domain.ClueActivityRelation;
+import com.xiefuzhong.crm.workbench.domain.*;
 import com.xiefuzhong.crm.workbench.service.ActivityService;
 import com.xiefuzhong.crm.workbench.service.ClueService;
 import com.xiefuzhong.crm.workbench.service.impl.ActivityServiceImpl;
@@ -56,8 +53,69 @@ public class ClueController extends HttpServlet {
         }else  if("/workbench/clue/bund.do".equals(path)){
             bund(request,response);
 
+        }else  if("/workbench/clue/getActivityListByName.do".equals(path)){
+            getActivityListByName(request,response);
+
+        }else  if("/workbench/clue/convert.do".equals(path)){
+            convert(request,response);
+
         }
 
+    }
+
+    private void convert(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        System.out.println("进入到执行线索转换操作");
+
+        String clueId = request.getParameter("clueId");
+        String flag = request.getParameter("flag");
+
+        Tran t = null;
+
+        String  createBy =((User)request.getSession().getAttribute("user")).getName();
+        //如果需要创建交易
+        if ("a".equals(flag)){
+            t = new Tran();
+            //接收交易表中的参数
+            String  money =request.getParameter("money");
+            String  name =request.getParameter("name");
+            String  expectDate  =request.getParameter("expectDate");
+            String  stage =request.getParameter("stage");
+            String  activityId =request.getParameter("activityId");
+            String  id = UUIDUtil.getUUID();
+            String  createTime = DateTimeUtil.getSysTime();
+
+
+            t.setActivityId(activityId);
+            t.setMoney(money);
+            t.setName(name);
+            t.setExpectedDate(expectDate);
+            t.setStage(stage);
+            t.setId(id);
+            t.setCreateBy(createBy);
+            t.setCreateTime(createTime);
+
+        }
+        //调业务层
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+        boolean flag1 = cs.convert(clueId,t,createBy);
+        //因为使用的是传统请求，所以作响应应该使用重定向或者转发
+            //使用request存值一般使用转发，但一般我们玩的都是重定向
+        if (flag1){
+
+            response.sendRedirect(request.getContextPath()+"/workbench/clue/index.jsp");
+        }
+
+
+    }
+
+    private void getActivityListByName(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("查询市场活动列表（根据名称模糊查）");
+        String aname = request.getParameter("aname");
+        ActivityService  as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        List<Activity>  aList = as.getActivityListByName(aname);
+        PrintJson.printJsonObj(response,aList);
     }
 
     private void bund(HttpServletRequest request, HttpServletResponse response) {

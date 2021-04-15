@@ -5,6 +5,16 @@
 
 <mapper namespace="com.xiefuzhong.crm.workbench.dao.ClueDao">
 
+    <delete id="delete">
+        delete  from  tbl_clue where id=#{id}
+    </delete>
+
+    <select id="getById" resultType="com.xiefuzhong.crm.workbench.domain.Clue">
+
+        select  * from tbl_clue where id=#{clueId}
+
+    </select>
+
     <select id="detail" resultType="com.xiefuzhong.crm.workbench.domain.Clue">
         select
             c.id,

@@ -38,5 +38,8 @@
     todayBtn: true,
     pickerPosition: "bottom-left"
     });
+
+//jstl标签库的使用
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 </body>
 </html>

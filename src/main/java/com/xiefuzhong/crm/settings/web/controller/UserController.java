@@ -26,8 +26,6 @@ public class UserController  extends HttpServlet {
         if("/settings/user/login.do".equals(path)){
             login(request,response);
 
-        }else  if("/settings/user/xxx.do".equals(path)){
-
         }
     }
 
