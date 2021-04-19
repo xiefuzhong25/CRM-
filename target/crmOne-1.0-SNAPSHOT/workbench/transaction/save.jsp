@@ -29,7 +29,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 	<script>
 
-		//写java脚本来将java中pMap转换成json
+		//拼接java脚本来将java中pMap转换成json
 		// 注意①有个硬性要求key必须套用在双引号当中,value不用  ②拼接json的时候不用考虑最后一个需要 判断 来使用逗号，因为首先我们声明的就是一个json 内部会自动处理好
 		var json = {
 
@@ -181,7 +181,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 			})
 
-			//为查找市场活动模态窗口中的确定按钮绑定事件
+			//为查找市场活动模态窗口中的 确定按钮 绑定事件
 			$("#submitActivityBtn").click(function () {
 				//取得选中市场活动的id
 				var $xz = $("input[name=xz]:checked");
@@ -288,6 +288,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			})
 
 
+			//为保存按钮绑定事件，执行交易添加操作
+			$("#saveBtn").click(function () {
+				//使用传统请求提交表单
+				$("#tranForm").submit();
+
+			})
 
 
 
@@ -388,50 +394,50 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<div style="position:  relative; left: 30px;">
 		<h3>创建交易</h3>
 	  	<div style="position: relative; top: -40px; left: 70%;">
-			<button type="button" class="btn btn-primary">保存</button>
+			<button type="button" class="btn btn-primary" id="saveBtn">保存</button>
 			<button type="button" class="btn btn-default">取消</button>
 		</div>
 		<hr style="position: relative; top: -40px;">
 	</div>
-	<form class="form-horizontal" role="form" style="position: relative; top: -30px;">
+	<form  action="workbench/transaction/save.do" id="tranForm" method="post" class="form-horizontal" role="form" style="position: relative; top: -30px;">
 		<div class="form-group">
 			<label for="create-transactionOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<select class="form-control" id="create-transactionOwner">
+				<select class="form-control" id="create-transactionOwner" name="owner">
 
 					<option></option>
 					<c:forEach items="${uList}" var="u">
 <%--						这里有一个知识点：jq中也可以使用三目运算符，只是用的相对较少【实现默认选中当前登录账户sessionScope.user.id】--%>
-						<option id="${u.id}" ${user.id eq u.id ? "selected" : ""}>${u.name}</option>
+						<option value="${u.id}" ${user.id eq u.id ? "selected" : ""}>${u.name}</option>
 					</c:forEach>
 
 				</select>
 			</div>
 			<label for="create-amountOfMoney" class="col-sm-2 control-label">金额</label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-amountOfMoney">
+				<input type="text" class="form-control" id="create-amountOfMoney" name="money">
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="create-transactionName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-transactionName">
+				<input type="text" class="form-control" id="create-transactionName" name="name">
 			</div>
 			<label for="create-expectedClosingDate" class="col-sm-2 control-label">预计成交日期<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control time1" id="create-expectedClosingDate">
+				<input type="text" class="form-control time1" id="create-expectedClosingDate" name="expectedDate">
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="create-customerName" class="col-sm-2 control-label">客户名称<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
+				<input type="text" class="form-control" id="create-customerName" name="customerName" placeholder="支持自动补全，输入客户不存在则新建">
 			</div>
 			<label for="create-stage" class="col-sm-2 control-label">阶段<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-			  <select class="form-control" id="create-stage">
+			  <select class="form-control" id="create-stage" name="stage">
 			  	<option></option>
 
 				  <c:forEach items="${stage}" var="s" >
@@ -445,7 +451,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div class="form-group">
 			<label for="create-transactionType" class="col-sm-2 control-label">类型</label>
 			<div class="col-sm-10" style="width: 300px;">
-				<select class="form-control" id="create-transactionType">
+				<select class="form-control" id="create-transactionType" name="type">
 				  <option></option>
 
 					<c:forEach items="${transactionType}" var="t" >
@@ -463,7 +469,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div class="form-group">
 			<label for="create-clueSource" class="col-sm-2 control-label">来源</label>
 			<div class="col-sm-10" style="width: 300px;">
-				<select class="form-control" id="create-clueSource">
+				<select class="form-control" id="create-clueSource" name="source">
 				  <option></option>
 
 					<c:forEach items="${source}" var="so" >
@@ -475,7 +481,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<label for="create-activitySrc" class="col-sm-2 control-label">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);" id="openFindMarketActivityModel" ><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<input type="text" class="form-control" id="create-activitySrc">
-				<input type="hidden"  id="create-activitySrcId">
+				<input type="hidden" name="activityId" id="create-activitySrcId">
 			</div>
 		</div>
 		
@@ -483,7 +489,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<label for="create-contactsName" class="col-sm-2 control-label">联系人名称&nbsp;&nbsp;<a href="javascript:void(0);" id="openFindContactsModel" ><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<input type="text" class="form-control" id="create-contactsName">
-				<input type="hidden" id="create-contactsNameId">
+				<input type="hidden" name="contactsId" id="create-contactsNameId">
 
 			</div>
 		</div>
@@ -491,21 +497,21 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div class="form-group">
 			<label for="create-describe" class="col-sm-2 control-label">描述</label>
 			<div class="col-sm-10" style="width: 70%;">
-				<textarea class="form-control" rows="3" id="create-describe"></textarea>
+				<textarea class="form-control" rows="3" id="create-describe" name="description"></textarea>
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="create-contactSummary" class="col-sm-2 control-label">联系纪要</label>
 			<div class="col-sm-10" style="width: 70%;">
-				<textarea class="form-control" rows="3" id="create-contactSummary"></textarea>
+				<textarea class="form-control" rows="3" id="create-contactSummary" name="contactSummary"></textarea>
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control time2" id="create-nextContactTime">
+				<input type="text" class="form-control time2" id="create-nextContactTime" name="nextContactTime">
 			</div>
 		</div>
 		

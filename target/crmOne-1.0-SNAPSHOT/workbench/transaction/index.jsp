@@ -17,19 +17,23 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 
+
+
 <script type="text/javascript">
 
 	$(function(){
-		
+
 		
 		
 	});
-	
+
+
 </script>
 </head>
 <body>
 
-	
+
+
 	
 	<div>
 		<div style="position: relative; left: 10px; top: -10px;">
@@ -145,7 +149,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox"  id="qx" /></td>
 							<td>名称</td>
 							<td>客户名称</td>
 							<td>阶段</td>
@@ -155,27 +159,19 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<td>联系人名称</td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/transaction/detail.jsp';">动力节点-交易01</a></td>
-							<td>动力节点</td>
-							<td>谈判/复审</td>
-							<td>新业务</td>
-							<td>zhangsan</td>
-							<td>广告</td>
-							<td>李四</td>
-						</tr>
-                        <tr class="active">
-                            <td><input type="checkbox" /></td>
-                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">动力节点-交易01</a></td>
-                            <td>动力节点</td>
-                            <td>谈判/复审</td>
-                            <td>新业务</td>
-                            <td>zhangsan</td>
-                            <td>广告</td>
-                            <td>李四</td>
-                        </tr>
+					<tbody >
+<%--这里页面的跳转我写死了，以后再优化--%>
+					<tr >
+						<td><input type="checkbox" /></td>
+						<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/transaction/detail.do?id=ec5bbad998194961877e0e5be96a2b76';">交易123</a></td>
+						<td>动力节点</td>
+						<td>谈判/复审</td>
+						<td>新业务</td>
+						<td>zhangsan</td>
+						<td>广告</td>
+						<td>李四</td>
+					</tr>
+
 					</tbody>
 				</table>
 			</div>

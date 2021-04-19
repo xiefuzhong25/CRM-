@@ -5,6 +5,42 @@
 
 <mapper namespace="com.xiefuzhong.crm.workbench.dao.TranDao">
 
+    <select id="detail" resultType="com.xiefuzhong.crm.workbench.domain.Tran">
+   select
+    tr.id,
+    us.name as owner,
+    tr.money,
+    tr.name,
+    expectedDate,
+    cu.name as customerId,
+    stage,
+    tr.type,
+    tr.source,
+    ac.name as activityId,
+    co.fullname as contactsId,
+    tr.createBy,
+    tr.createTime,
+    tr.editBy,
+    tr.editTime,
+    tr.description,
+    tr.contactSummary,
+    tr.nextContactTime
+
+
+        from  tbl_tran  tr
+        join  tbl_user us
+        on tr.owner=us.id
+        join  tbl_customer  cu
+        on tr.customerId=cu.id
+        left join  tbl_activity ac
+        on tr.activityId=ac.id
+       left join tbl_contacts co
+        on  tr.contactsId=co.id
+        where  tr.id=#{id}
+    </select>
+
+
+
     <insert id="save">
 
         insert into tbl_tran(
