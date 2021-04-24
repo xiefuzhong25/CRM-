@@ -5,6 +5,11 @@
 
 <mapper namespace="com.xiefuzhong.crm.workbench.dao.TranDao">
 
+    <update id="changeStage" >
+        update tbl_tran set stage=#{stage},editBy=#{editBy},editTime=#{editTime}
+        where  id=#{id}
+    </update>
+
     <select id="detail" resultType="com.xiefuzhong.crm.workbench.domain.Tran">
    select
     tr.id,

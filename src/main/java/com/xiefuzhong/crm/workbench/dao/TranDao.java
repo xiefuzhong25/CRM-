@@ -9,4 +9,6 @@ public interface TranDao {
 
 
     Tran detail(String id);
+
+    int changeStage(Tran t);
 }

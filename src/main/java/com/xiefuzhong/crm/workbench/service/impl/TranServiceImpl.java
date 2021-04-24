@@ -3,19 +3,15 @@ package com.xiefuzhong.crm.workbench.service.impl;
 import com.xiefuzhong.crm.utils.DateTimeUtil;
 import com.xiefuzhong.crm.utils.SqlSessionUtil;
 import com.xiefuzhong.crm.utils.UUIDUtil;
-import com.xiefuzhong.crm.workbench.dao.ContactsDao;
 import com.xiefuzhong.crm.workbench.dao.CustomerDao;
 import com.xiefuzhong.crm.workbench.dao.TranDao;
 import com.xiefuzhong.crm.workbench.dao.TranHistoryDao;
-import com.xiefuzhong.crm.workbench.domain.Clue;
 import com.xiefuzhong.crm.workbench.domain.Customer;
 import com.xiefuzhong.crm.workbench.domain.Tran;
 import com.xiefuzhong.crm.workbench.domain.TranHistory;
 import com.xiefuzhong.crm.workbench.service.TranService;
-import com.xiefuzhong.crm.workbench.vo.PaginationVo;
 
 import java.util.List;
-import java.util.Map;
 
 public class TranServiceImpl implements TranService {
 
@@ -80,6 +76,32 @@ public class TranServiceImpl implements TranService {
     public List<TranHistory> showHistoryList(String tranId) {
         List<TranHistory> thList = tranHistoryDao.showHistoryList(tranId);
         return thList;
+    }
+
+    @Override
+    public boolean changeStage(Tran t) {
+        boolean flag = true;
+        int count1 = tranDao.changeStage(t);
+        if (count1!=1){
+            flag = false;
+        }
+
+        //交易阶段改变后，生成一条交易历史
+        TranHistory th = new TranHistory();
+        th.setId(UUIDUtil.getUUID());
+        th.setCreateBy(t.getEditBy());
+        th.setCreateTime(DateTimeUtil.getSysTime());
+        th.setExpectedDate(t.getExpectedDate());
+        th.setMoney(t.getMoney());
+        th.setTranId(t.getId());
+        th.setStage(t.getStage());
+
+        int count2 = tranHistoryDao.save(th);
+        if (count2!=1){
+            flag = false;
+        }
+
+        return flag;
     }
 
 

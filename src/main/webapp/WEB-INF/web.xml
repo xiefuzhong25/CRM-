@@ -102,6 +102,7 @@
         <url-pattern>/workbench/transaction/save.do</url-pattern>
         <url-pattern>/workbench/transaction/detail.do</url-pattern>
         <url-pattern>/workbench/transaction/showHistoryList.do</url-pattern>
+        <url-pattern>/workbench/transaction/changeStage.do</url-pattern>
 
 
 

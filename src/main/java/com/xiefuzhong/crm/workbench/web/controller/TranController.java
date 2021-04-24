@@ -55,7 +55,46 @@ public class TranController extends HttpServlet {
         }else  if("/workbench/transaction/showHistoryList.do".equals(path)){
             showHistoryList(request,response);
 
+        }else  if("/workbench/transaction/changeStage.do".equals(path)){
+            changeStage(request,response);
+
         }
+
+
+    }
+
+    private void changeStage(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("执行改变阶段操作");
+
+        String id = request.getParameter("id");
+        String stage = request.getParameter("stage");
+        String money = request.getParameter("money");
+        String expectedDate = request.getParameter("expectedDate");
+        String editTime = DateTimeUtil.getSysTime();
+        String editBy = ((User)request.getSession().getAttribute("user")).getName();
+
+        Tran t = new Tran();
+        t.setId(id);
+        t.setStage(stage);
+        t.setEditBy(editBy);
+        t.setEditTime(editTime);
+        t.setMoney(money);
+        t.setExpectedDate(expectedDate);
+
+        TranService ts = (TranService) ServiceFactory.getService(new TranServiceImpl());
+         boolean flag  = ts.changeStage(t);
+
+         //处理可能性[从application域中取得pMap,阶段与可能性的对应关系]
+        Map<String,String> pMap = (Map<String, String>) this.getServletContext().getAttribute("pMap");
+         String possibility = pMap.get(stage);
+
+         Map<String,Object> map = new HashMap<>();
+         map.put("success",flag);
+         map.put("t",t);
+         map.put("possibility",possibility);
+
+         PrintJson.printJsonObj(response,map);
 
 
     }
