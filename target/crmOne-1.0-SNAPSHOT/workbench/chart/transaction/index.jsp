@@ -43,7 +43,7 @@
         })
 
         function getCharts() {
-           
+
 
             $.ajax({
                 url: "workbench/transaction/getCharts.do",
