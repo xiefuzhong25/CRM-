@@ -270,8 +270,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					</thead>
 					<tbody>
 						<tr>
+<%--									此处修改le路径--%>
 							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">动力节点</a></td>
+							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/customer/detail.html';">动力节点</a></td>
 							<td>zhangsan</td>
 							<td>010-84846003</td>
 							<td>http://www.bjpowernode.com</td>

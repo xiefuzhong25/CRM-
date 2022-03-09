@@ -28,41 +28,89 @@ public class ActivityController extends HttpServlet {
 
         String path = request.getServletPath();
 
-        if("/workbench/activity/getUserList.do".equals(path)){
-            getUserList(request,response);
+        if ("/workbench/activity/getUserList.do".equals(path)) {
+            getUserList(request, response);
 
 
-        }else  if("/workbench/activity/save.do".equals(path)){
-            save(request,response);
+        } else if ("/workbench/activity/save.do".equals(path)) {
+            save(request, response);
 
-        }else  if("/workbench/activity/pageList.do".equals(path)){
-            pageList(request,response);
+        } else if ("/workbench/activity/pageList.do".equals(path)) {
+            pageList(request, response);
 
-        }else  if("/workbench/activity/delete.do".equals(path)){
-            delete(request,response);
+        } else if ("/workbench/activity/delete.do".equals(path)) {
+            delete(request, response);
 
-        }else  if("/workbench/activity/getUserListAndActivity.do".equals(path)){
-            getUserListAndActivity(request,response);
+        } else if ("/workbench/activity/getUserListAndActivity.do".equals(path)) {
+            getUserListAndActivity(request, response);
 
-        }else  if("/workbench/activity/update.do".equals(path)){
-            update(request,response);
+        } else if ("/workbench/activity/update.do".equals(path)) {
+            update(request, response);
 
-        }else  if("/workbench/activity/detail.do".equals(path)){
-            detail(request,response);
+        } else if ("/workbench/activity/detail.do".equals(path)) {
+            detail(request, response);
 
-        }else  if("/workbench/activity/getRemarkListByAid.do".equals(path)){
-            getRemarkListByAid(request,response);
+        } else if ("/workbench/activity/getRemarkListByAid.do".equals(path)) {
+            getRemarkListByAid(request, response);
 
-        }else  if("/workbench/activity/deleteRemark.do".equals(path)){
-            deleteRemark(request,response);
+        } else if ("/workbench/activity/deleteRemark.do".equals(path)) {
+            deleteRemark(request, response);
 
-        }else  if("/workbench/activity/saveRemark.do".equals(path)){
-            saveRemark(request,response);
+        } else if ("/workbench/activity/saveRemark.do".equals(path)) {
+            saveRemark(request, response);
 
-        }else  if("/workbench/activity/updateRemark.do".equals(path)){
-            updateRemark(request,response);
+        } else if ("/workbench/activity/updateRemark.do".equals(path)) {
+            updateRemark(request, response);
+
+        } else if ("/workbench/activity/updateDetail.do".equals(path)) {
+            updateDetail(request, response);
 
         }
+
+
+    }
+
+    private void updateDetail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("进入市场活动的详情页中编辑按钮中的模态窗口中的更新操作");
+        String id = request.getParameter("id");
+        String owner = request.getParameter("owner");
+        String name = request.getParameter("name");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        String cost = request.getParameter("cost");
+        String description = request.getParameter("description");
+        //修改时间,当前的系统时间createTime
+        String editTime = DateTimeUtil.getSysTime();
+        //从session域中获取当前修改用户
+        String editBy = ((User) request.getSession().getAttribute("user")).getName();
+
+        //封装上面这些参数 方便 后面传进方法中当参数
+        Activity ac = new Activity();
+        ac.setId(id);
+        ac.setOwner(owner);
+        ac.setName(name);
+        ac.setStartDate(startDate);
+        ac.setEndDate(endDate);
+        ac.setCost(cost);
+        ac.setDescription(description);
+        ac.setEditTime(editTime);
+        ac.setEditBy(editBy);
+
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        boolean flag = as.update(ac);
+
+        //处理所有者展示名字
+        UserService us = (UserService) ServiceFactory.getService(new UserServiceImpl());
+        String nameStr = us.getUserNameById(owner);
+
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("flag", flag);
+        map.put("a", ac);
+        map.put("nameStr", nameStr);
+
+        PrintJson.printJsonObj(response, map);
 
 
     }
@@ -72,12 +120,12 @@ public class ActivityController extends HttpServlet {
         System.out.println("进入到编辑修改备注的模态窗口");
 
         String id = request.getParameter("id");
-        String  noteContent = request.getParameter("noteContent");
+        String noteContent = request.getParameter("noteContent");
         String editTime = DateTimeUtil.getSysTime();
-        String editBy =((User)request.getSession().getAttribute("user")).getName();
+        String editBy = ((User) request.getSession().getAttribute("user")).getName();
         String editFlag = "1";
 
-        ActivityRemark ar =  new ActivityRemark();
+        ActivityRemark ar = new ActivityRemark();
         ar.setId(id);
         ar.setNoteContent(noteContent);
         ar.setEditTime(editTime);
@@ -85,24 +133,24 @@ public class ActivityController extends HttpServlet {
         ar.setEditFlag(editFlag);
 
         ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
-        boolean  flag =  as.updateRemark(ar);
+        boolean flag = as.updateRemark(ar);
 
-        Map<String,Object> map = new HashMap<>();
-        map.put("success",flag);
-        map.put("ar",ar);
+        Map<String, Object> map = new HashMap<>();
+        map.put("success", flag);
+        map.put("ar", ar);
 
-        PrintJson.printJsonObj(response,map);
+        PrintJson.printJsonObj(response, map);
     }
 
     private void saveRemark(HttpServletRequest request, HttpServletResponse response) {
 
         System.out.println("进入到添加备注操作");
 
-        String  noteContent = request.getParameter("noteContent");
-        String  activityId = request.getParameter("activityId");
+        String noteContent = request.getParameter("noteContent");
+        String activityId = request.getParameter("activityId");
         String id = UUIDUtil.getUUID();
         String createTime = DateTimeUtil.getSysTime();
-        String createBy =((User)request.getSession().getAttribute("user")).getName();
+        String createBy = ((User) request.getSession().getAttribute("user")).getName();
         String editFlag = "0";
 
         ActivityRemark ar = new ActivityRemark();
@@ -114,14 +162,14 @@ public class ActivityController extends HttpServlet {
         ar.setCreateBy(createBy);
         ar.setEditFlag(editFlag);
 
-         ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
-         boolean flag = as.saveRemark(ar);
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        boolean flag = as.saveRemark(ar);
 
-         Map<String,Object> map = new HashMap<String,Object>();
-         map.put("success",flag);
-         map.put("ar",ar);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", flag);
+        map.put("ar", ar);
 
-         PrintJson.printJsonObj(response,map);
+        PrintJson.printJsonObj(response, map);
 
     }
 
@@ -135,7 +183,7 @@ public class ActivityController extends HttpServlet {
 
         boolean flag = as.deleteRemark(id);
 
-        PrintJson.printJsonFlag(response,flag);
+        PrintJson.printJsonFlag(response, flag);
     }
 
     private void getRemarkListByAid(HttpServletRequest request, HttpServletResponse response) {
@@ -146,22 +194,22 @@ public class ActivityController extends HttpServlet {
 
         ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
 
-        List<ActivityRemark>  arList = as.getRemarkListByAid(activityId);
+        List<ActivityRemark> arList = as.getRemarkListByAid(activityId);
 
-        PrintJson.printJsonObj(response,arList);
+        PrintJson.printJsonObj(response, arList);
     }
 
     private void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("进入到跳转到详细信息页的操作,使用传统请求方式");
         String id = request.getParameter("id");
-       ActivityService as= (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
-       Activity a =as.detail(id);
-       //使用传统方式来实现功能，使用转发或者重定向的方式
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        Activity a = as.detail(id);
+        //使用传统方式来实现功能，使用转发或者重定向的方式
         //使用request域就足够来存数据
         // 想要使用er表达式取request域取值就必须要用转发
         // 路径写法不用/项目名，因为是内部路径
-        request.setAttribute("a",a);
-        request.getRequestDispatcher("/workbench/activity/detail.jsp").forward(request,response);
+        request.setAttribute("a", a);
+        request.getRequestDispatcher("/workbench/activity/detail.jsp").forward(request, response);
 
     }
 
@@ -177,10 +225,10 @@ public class ActivityController extends HttpServlet {
         //修改时间,当前的系统时间createTime
         String editTime = DateTimeUtil.getSysTime();
         //从session域中获取当前修改用户
-        String editBy =((User)request.getSession().getAttribute("user")).getName();
+        String editBy = ((User) request.getSession().getAttribute("user")).getName();
 
         //封装上面这些参数 方便 后面传进方法中当参数
-        Activity  a = new Activity();
+        Activity a = new Activity();
         a.setId(id);
         a.setOwner(owner);
         a.setName(name);
@@ -192,9 +240,9 @@ public class ActivityController extends HttpServlet {
         a.setEditBy(editBy);
 
 
-        ActivityService  as = (ActivityService) ServiceFactory.getService( new ActivityServiceImpl());
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
         boolean flag = as.update(a);
-        PrintJson.printJsonFlag(response,flag);
+        PrintJson.printJsonFlag(response, flag);
     }
 
     private void getUserListAndActivity(HttpServletRequest request, HttpServletResponse response) {
@@ -203,8 +251,8 @@ public class ActivityController extends HttpServlet {
         ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
         //前端要什么就返回啥 uList     a
         //复用率太低直接使用map  处理过程叫业务层去做
-        Map<String,Object> map = as.getUserListAndActivity(id);
-        PrintJson.printJsonObj(response,map);
+        Map<String, Object> map = as.getUserListAndActivity(id);
+        PrintJson.printJsonObj(response, map);
 
     }
 
@@ -212,8 +260,8 @@ public class ActivityController extends HttpServlet {
         System.out.println("执行市场活动的删除操作");
         String ids[] = request.getParameterValues("id");
         ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
-        boolean flag =  as.delete(ids);
-        PrintJson.printJsonFlag(response,flag);
+        boolean flag = as.delete(ids);
+        PrintJson.printJsonFlag(response, flag);
 
 
     }
@@ -223,12 +271,12 @@ public class ActivityController extends HttpServlet {
 
 
         String pageNoStr = request.getParameter("pageNo");
-             int pageNo=Integer.valueOf(pageNoStr);
+        int pageNo = Integer.valueOf(pageNoStr);
         //每页展现的记录数
         String pageSizeStr = request.getParameter("pageSize");
-             int pageSize = Integer.valueOf(pageSizeStr);
+        int pageSize = Integer.valueOf(pageSizeStr);
         //计算略过的记录数,sql语句需要的是这个参数 XXX limit  skipCount,pageSize
-        int skipCount = (pageNo-1)*pageSize;
+        int skipCount = (pageNo - 1) * pageSize;
 
         String name = request.getParameter("name");
         String owner = request.getParameter("owner");
@@ -236,15 +284,15 @@ public class ActivityController extends HttpServlet {
         String endDate = request.getParameter("endDate");
 
 
-        Map<String,Object>  map = new HashMap<>();
-        map.put("skipCount",skipCount);
-        map.put("pageSize",pageSize);
-        map.put("name",name);
-        map.put("owner",owner);
-        map.put("startDate",startDate);
-        map.put("endDate",endDate);
+        Map<String, Object> map = new HashMap<>();
+        map.put("skipCount", skipCount);
+        map.put("pageSize", pageSize);
+        map.put("name", name);
+        map.put("owner", owner);
+        map.put("startDate", startDate);
+        map.put("endDate", endDate);
 
-        ActivityService  as = (ActivityService) ServiceFactory.getService( new ActivityServiceImpl());
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
         /*
         前端需要：市场活动信息列表
                     查询的总条数
@@ -272,27 +320,27 @@ public class ActivityController extends HttpServlet {
         //因为业务层将数据封装在了vo类中，所以返回的数据类型是这个vo类
         PaginationVo<Activity> vo = as.pageList(map);
         //将数据以json形式返回前端  {"total":100,"dataList":[{市场活动1}，{2}，{3}
-        PrintJson.printJsonObj(response,vo);
+        PrintJson.printJsonObj(response, vo);
 
     }
 
     private void save(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("执行市场活动的添加操作");
 
-      String id = UUIDUtil.getUUID();
-      String owner = request.getParameter("owner");
-      String name = request.getParameter("name");
-      String startDate = request.getParameter("startDate");
-      String endDate = request.getParameter("endDate");
-      String cost = request.getParameter("cost");
-      String description = request.getParameter("description");
-      //创建时间,当前的系统时间createTime
-      String createTime = DateTimeUtil.getSysTime();
-      //从session域中获取当前登录用户
-      String createBy =((User)request.getSession().getAttribute("user")).getName();
+        String id = UUIDUtil.getUUID();
+        String owner = request.getParameter("owner");
+        String name = request.getParameter("name");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        String cost = request.getParameter("cost");
+        String description = request.getParameter("description");
+        //创建时间,当前的系统时间createTime
+        String createTime = DateTimeUtil.getSysTime();
+        //从session域中获取当前登录用户
+        String createBy = ((User) request.getSession().getAttribute("user")).getName();
 
         //封装上面这些参数 方便 后面传进方法中当参数
-        Activity  a = new Activity();
+        Activity a = new Activity();
         a.setId(id);
         a.setOwner(owner);
         a.setName(name);
@@ -304,9 +352,9 @@ public class ActivityController extends HttpServlet {
         a.setCreateBy(createBy);
 
 
-        ActivityService  as = (ActivityService) ServiceFactory.getService( new ActivityServiceImpl());
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
         boolean flag = as.save(a);
-        PrintJson.printJsonFlag(response,flag);
+        PrintJson.printJsonFlag(response, flag);
 
 
     }
@@ -315,10 +363,10 @@ public class ActivityController extends HttpServlet {
     private void getUserList(HttpServletRequest request, HttpServletResponse response) {
 
         System.out.println("取得用户信息列表");
-        UserService us = (UserService) ServiceFactory.getService( new UserServiceImpl());
+        UserService us = (UserService) ServiceFactory.getService(new UserServiceImpl());
         List<User> uList = us.getUserList();
         //将得到的结果解析成json形式
-        PrintJson.printJsonObj(response,uList);
+        PrintJson.printJsonObj(response, uList);
     }
 
 

@@ -9,8 +9,8 @@
         <module name="crmOne" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="crmOne" target="12" />
+    <bytecodeTargetLevel target="11">
+      <module name="crmOne" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

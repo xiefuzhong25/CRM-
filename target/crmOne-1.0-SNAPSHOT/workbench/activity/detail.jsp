@@ -10,8 +10,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <meta charset="UTF-8">
 
 	<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
+
 	<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 	<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 
 	<script type="text/javascript">
 
@@ -19,6 +23,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	var cancelAndSaveBtnDefault = true;
 	
 	$(function(){
+
+        $(".time").datetimepicker({
+            minView: "month",
+            language:  'zh-CN',
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayBtn: true,
+            pickerPosition: "bottom-left"
+        });
+
 		$("#remark").focus(function(){
 			if(cancelAndSaveBtnDefault){
 				//设置remarkDiv的高度为130px
@@ -52,6 +66,119 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		$(".myHref").mouseout(function(){
 			$(this).children("span").css("color","#E6E6E6");
 		});
+
+
+        //编辑窗口绑定事件，打开编辑窗口的模态窗口
+        $("#editBtn").click(function () {
+
+            var id = "${a.id}";
+            $.ajax({
+                url : "workbench/activity/getUserListAndActivity.do",
+                data : {
+                    "id": id
+
+                },
+                type : "get",
+                dataType : "json",
+                success : function (data) {
+                    /*
+                    前台需要 {"uList":[{用户1}，{用户2}，。。],"a":{一个市场活动列表}}
+
+                     */
+                    //处理所有者下拉框
+                    var html ="<option></option>";
+                    $.each(data.uList,function (i,n) {
+                        html  += "<option value='"+n.id+"'>"+n.name+"</option>";
+
+                    })
+                    $("#edit-owner").html(html);
+
+                    //处理单条activity
+
+                    $("#edit-id").val(data.a.id);
+                    $("#edit-name").val(data.a.name);
+                    $("#edit-owner").val(data.a.owner);
+                    $("#edit-startDate").val(data.a.startDate);
+                    $("#edit-endDate").val(data.a.endDate);
+                    $("#edit-cost").val(data.a.cost);
+                    $("#edit-description").val(data.a.description);
+
+                    //所有的值都填好了就打开模态窗口
+                    $("#editActivityModal").modal("show");
+
+                }
+            })
+
+        })
+
+        // 更新按钮绑定事件
+        $("#updateBtn").click(function () {
+
+            $.ajax({
+                url : "workbench/activity/updateDetail.do",
+                data : {
+                    "id" :$.trim($("#edit-id").val()),
+                    "owner" :$.trim($("#edit-owner").val()),
+                    "name":$.trim($("#edit-name").val()),
+                    "startDate":$.trim($("#edit-startDate").val()),
+                    "endDate":$.trim($("#edit-endDate").val()),
+                    "cost":$.trim($("#edit-cost").val()),
+                    "description":$.trim($("#edit-description").val())
+                },
+                type: "post",
+                dataType: "json",
+                success : function (data) {
+                    if (data.flag){
+                        //处理单条activity
+                        $("#actTittle").html("市场活动-"+data.a.name+" <small>"+  data.a.startDate+"~ "+ data.a.endDate+"</small>");
+                       // $("#edit-id").val(data.a.id);
+                        $("#detail-name").html(data.a.name);
+                        $("#detail-owner").html(data.nameStr);
+                        $("#detail-startDate").html(data.a.startDate);
+                        $("#detail-endDate").html(data.a.endDate);
+                        $("#detail-editBy").html(data.a.editBy+"&nbsp;&nbsp;");
+                        $("#detail-editTime").html(data.a.editTime);
+                        $("#detail-cost").html(data.a.cost);
+                        $("#detail-description").html(data.a.description);
+                        //关闭修改操作的模态窗口
+                        $("#editActivityModal").modal("hide");
+
+                    }else  {
+                        alert("更新失败")
+                    }
+                }
+            })
+
+        })
+
+        //为删除按钮绑定事件,执行删除市场活动删除操作
+        $("#deleteBtn").click(function () {
+
+            var id = "${a.id}";
+                //删除前给一个有好的提示
+                if (confirm("确定删除这条记录吗")){
+                    //发起后台请求
+                    $.ajax({
+                        url :"workbench/activity/delete.do",
+                        data : {
+                            "id" : id
+                        },
+                        type : "post",
+                        dataType : "json",
+                        success : function (data) {
+
+                            // data
+                            //		{"success":true/false}
+                            if (data.success){
+                                //删除成功后需要回到市场活动列表
+                                window.location.href = "workbench/activity/index.jsp";
+                            }else {
+                                alert("删除市场活动列表失败");
+                            }
+                        }
+                    })
+                }
+        })
 
 		//在页面加载之后，展现该市场活动关联的备注信息列表
 		showRemarkList();
@@ -290,49 +417,51 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     <button type="button" class="close" data-dismiss="modal">
                         <span aria-hidden="true">×</span>
                     </button>
-                    <h4 class="modal-title" id="myModalLabel">修改市场活动</h4>
+                    <h4 class="modal-title" id="myModalLabel2">修改市场活动</h4>
                 </div>
                 <div class="modal-body">
 
                     <form class="form-horizontal" role="form">
+                        <%--隐藏域存放id用来后面更新到数据库知道是谁--%>
+                        <input type="hidden" id="edit-id">
 
                         <div class="form-group">
-                            <label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
+                            <label for="edit-owner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <select class="form-control" id="edit-marketActivityOwner">
-                                    <option>zhangsan</option>
-                                    <option>lisi</option>
-                                    <option>wangwu</option>
+                                <select class="form-control" id="edit-owner">
+<%--                                    <option>zhangsan</option>--%>
+<%--                                    <option>lisi</option>--%>
+<%--                                    <option>wangwu</option>--%>
                                 </select>
                             </div>
                             <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input type="text" class="form-control" id="edit-marketActivityName" value="发传单">
+                                <input type="text" class="form-control" id="edit-name" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input type="text" class="form-control" id="edit-startTime" value="2020-10-10">
+                                <input type="text" class="form-control time" id="edit-startDate"  readonly >
                             </div>
                             <label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input type="text" class="form-control" id="edit-endTime" value="2020-10-20">
+                                <input type="text" class="form-control time" id="edit-endDate" readonly>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="edit-cost" class="col-sm-2 control-label">成本</label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input type="text" class="form-control" id="edit-cost" value="5,000">
+                                <input type="text" class="form-control" id="edit-cost" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="edit-describe" class="col-sm-2 control-label">描述</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" rows="3" id="edit-describe">市场活动Marketing，是指品牌主办或参与的展览会议与公关市场活动，包括自行主办的各类研讨会、客户交流会、演示会、新产品发布会、体验会、答谢会、年会和出席参加并布展或演讲的展览会、研讨会、行业交流会、颁奖典礼等</textarea>
+                                <textarea class="form-control" rows="3" id="edit-description"></textarea>
                             </div>
                         </div>
 
@@ -341,7 +470,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+                    <button type="button" class="btn btn-primary" id="updateBtn">更新</button>
                 </div>
             </div>
         </div>
@@ -357,11 +486,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div class="page-header">
 <%-- ${a.name} 意思是取出某一范围中名称为username的变量，
 它的取值范围依次是 Page,Request,Session,Application。--%>
-			<h3>市场活动-${a.name} <small>${a.startDate}~ ${a.endDate}</small></h3>
+			<h3 id="actTittle">市场活动-${a.name} <small>${a.startDate}~ ${a.endDate}</small></h3>
 		</div>
 		<div style="position: relative; height: 50px; width: 250px;  top: -72px; left: 700px;">
-			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-edit"></span> 编辑</button>
-			<button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+			<button type="button" class="btn btn-default"  id="editBtn" ><span class="glyphicon glyphicon-edit"></span> 编辑</button>
+			<button type="button" class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 		</div>
 	</div>
 	
@@ -369,40 +498,40 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<div style="position: relative; top: -70px;">
 		<div style="position: relative; left: 40px; height: 30px;">
 			<div style="width: 300px; color: gray;">所有者</div>
-			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${a.owner}</b></div>
+			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b id="detail-owner">${a.owner}</b></div>
 			<div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">名称</div>
-			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>${a.name}</b></div>
+			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b id="detail-name">${a.name}</b></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
 		</div>
 
 		<div style="position: relative; left: 40px; height: 30px; top: 10px;">
 			<div style="width: 300px; color: gray;">开始日期</div>
-			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${a.startDate}</b></div>
+			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b id="detail-startDate">${a.startDate}</b></div>
 			<div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">结束日期</div>
-			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>${a.endDate}</b></div>
+			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b id="detail-endDate">${a.endDate}</b></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
 		</div>
 		<div style="position: relative; left: 40px; height: 30px; top: 20px;">
 			<div style="width: 300px; color: gray;">成本</div>
-			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${a.cost}</b></div>
+			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b id="detail-cost">${a.cost}</b></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -20px;"></div>
 		</div>
 		<div style="position: relative; left: 40px; height: 30px; top: 30px;">
 			<div style="width: 300px; color: gray;">创建者</div>
-			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${a.createBy}&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;">${a.createTime}</small></div>
+			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b id="detail-createBy">${a.createBy}&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;" id="detail-createTime">${a.createTime}</small></div>
 			<div style="height: 1px; width: 550px; background: #D5D5D5; position: relative; top: -20px;"></div>
 		</div>
 		<div style="position: relative; left: 40px; height: 30px; top: 40px;">
 			<div style="width: 300px; color: gray;">修改者</div>
-			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${a.editBy}&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;">${a.editTime}</small></div>
+			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b id="detail-editBy">${a.editBy}&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;" id="detail-editTime">${a.editTime}</small></div>
 			<div style="height: 1px; width: 550px; background: #D5D5D5; position: relative; top: -20px;"></div>
 		</div>
 		<div style="position: relative; left: 40px; height: 30px; top: 50px;">
 			<div style="width: 300px; color: gray;">描述</div>
 			<div style="width: 630px;position: relative; left: 200px; top: -20px;">
-				<b>
+				<b id="detail-description">
 					${a.description}
 				</b>
 			</div>

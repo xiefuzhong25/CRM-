@@ -27,7 +27,7 @@ public class SqlSessionUtil {
 		 new SqlSessionFactoryBuilder().build(inputStream);
 		
 	}
-	// 解决资源争抢问题.
+	// 解决资源争抢问题.ThreadLocal在某一单个线程中是安全的一种存储容器，保证同一个线程使用的是同一个SQLSession对象，执行事务操作
 	private static ThreadLocal<SqlSession> t = new ThreadLocal<SqlSession>();
 	
 	public static SqlSession getSqlSession(){
@@ -37,6 +37,7 @@ public class SqlSessionUtil {
 		if(session==null){
 			
 			session = factory.openSession();
+
 			t.set(session);
 		}
 		
@@ -48,6 +49,7 @@ public class SqlSessionUtil {
 		
 		if(session!=null){
 			session.close();
+			//切记不可以忘记移除
 			t.remove();
 		}
 		

@@ -27,22 +27,23 @@
 
 	$(function(){
 
-
-		//为创建按钮绑定事件，打开添加操作的模态窗口
-		$("#addBtn").click(function () {
-			/*
+		/*
 			bootstrap-datetimepicker.js  里面的时间插件
 			datetimepicker   方法也是内部写好的
 			想引用的话 直接用class
 			*/
-			$(".time").datetimepicker({
-				minView: "month",
-				language:  'zh-CN',
-				format: 'yyyy-mm-dd',
-				autoclose: true,
-				todayBtn: true,
-				pickerPosition: "bottom-left"
-			});
+		$(".time").datetimepicker({
+			minView: "month",
+			language:  'zh-CN',
+			format: 'yyyy-mm-dd',
+			autoclose: true,
+			todayBtn: true,
+			pickerPosition: "bottom-left"
+		});
+
+		//为创建按钮绑定事件，打开添加操作的模态窗口
+		$("#addBtn").click(function () {
+
 			/*
 			操作模态窗口的jQuery对象，调用modal方法，为该方法传递参数 show：打开模态窗口    hide关闭模态窗口
 			 */
@@ -387,6 +388,7 @@
 					})
 					$("#activityBody").html(html);
 /*
+这里引用了bootstrap的分页插件
 这里实现了点击插件分页的时候也会局部刷新列表
  */
 					//计算总页数
@@ -596,13 +598,13 @@
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">开始日期</div>
-					  <input class="form-control" type="text" id="search-startDate" />
+					  <input class="form-control " type="text" id="search-startDate"  />
 				    </div>
 				  </div>
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">结束日期</div>
-					  <input class="form-control" type="text" id="search-endDate">
+					  <input class="form-control " type="text" id="search-endDate" >
 
 				    </div>
 				  </div>
