@@ -156,7 +156,7 @@
             //为删除按钮绑定事件,执行删除市场活动删除操作
             $("#deleteBtn").click(function () {
 
-                var id = "${a.id}";
+                var id = "${c.id}";
                 //删除前给一个有好的提示
                 if (confirm("确定删除这条记录吗")) {
                     //发起后台请求
@@ -168,8 +168,6 @@
                         type: "post",
                         dataType: "json",
                         success: function (data) {
-
-                            // data
                             //		{"success":true/false}
                             if (data.success) {
                                 //删除成功后需要回到市场活动列表

@@ -204,7 +204,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	</div>
 	
 	<div id="divider2" style="height: 1px; width: 100%; position: absolute;bottom: 30px; background-color: #B3B3B3;">
-		<h1>nihao1</h1>
+<%--		<h1>nihao1</h1>--%>
 	</div>
 	
 	<!-- 底部 -->

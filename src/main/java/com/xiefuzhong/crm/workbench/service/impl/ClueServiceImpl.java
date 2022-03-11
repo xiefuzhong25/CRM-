@@ -11,11 +11,15 @@ import com.xiefuzhong.crm.workbench.service.ClueService;
 import com.xiefuzhong.crm.workbench.vo.PaginationVo;
 
 import java.lang.ref.Cleaner;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class ClueServiceImpl implements ClueService {
+
+    //用户相关的表
+    private UserDao  userDao = SqlSessionUtil.getSqlSession().getMapper(UserDao.class);
 
     //线索相关表
     private ClueDao clueDao = SqlSessionUtil.getSqlSession().getMapper(ClueDao.class);
@@ -236,8 +240,6 @@ public class ClueServiceImpl implements ClueService {
           if (count7!=1){
               flag = false;
           }
-
-
         }
 
         //第八步：删除线索备注[tbl_clue_remark]
@@ -257,21 +259,104 @@ public class ClueServiceImpl implements ClueService {
                 flag = false;
             }
         }
-
         //第十步：删除线索
         int count10 = clueDao.delete(clueId);
         if (count10!=1){
             flag = false;
         }
 
+        return flag;
+    }
 
+    @Override
+    public Map<String, Object> getUserListAndClue(String id) {
+        //取用户uList
+        List<User> uList = userDao.getUserList();
+        //取得线索数据
+        Clue  c = clueDao.getById(id);
 
+        Map<String,Object>  map = new HashMap<>();
+        map.put("uList",uList);
+        map.put("c",c);
 
+        return map;
+    }
+
+    @Override
+    public boolean update(Clue c) {
+        boolean flag= true;
+        int count = clueDao.update(c);
+        if (count!=1){
+            flag = false;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean deleteByCids(String[] ids) {
+        boolean flag = true;
+        //查询出需要删除的备注的数量
+        int count1 = clueRemarkDao.getCountByCids(ids);
+
+        //删除备注，返回受到影响的条数（实际删除的数量）
+        int count2 = clueRemarkDao.deleteByCids(ids);
+
+        if (count1 != count2) {
+            flag = false;
+        }
+
+        //查询出线索关联的市场活动的数量
+        int count3 = clueActivityRelationDao.getListCountByClueId(ids);
+        //删除线索-市场活动表中的数据
+        int count4 = clueActivityRelationDao.deleteClueAndActivityList(ids);
+        if (count3 != count4){
+            flag = false;
+        }
+
+        //删除线索
+        int count5 = clueDao.deleteByCids(ids);
+        if (count5 != ids.length) {
+            flag = false;
+        }
 
         return flag;
     }
 
+    @Override
+    public List<ClueRemark> getRemarkListByCid(String clueId) {
+        List<ClueRemark>  crList = clueRemarkDao.getListByClueId(clueId);
+        return crList;
+    }
 
+    @Override
+    public boolean saveRemark(ClueRemark ar) {
+        boolean flag = true;
+        int count = clueRemarkDao.saveRemark(ar);
+        if (count != 1) {
+            flag = false;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean updateRemark(ClueRemark cr) {
+        boolean flag = true;
+        int count = clueRemarkDao.updateRemark(cr);
+        if (count != 1) {
+            flag = false;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean deleteRemark(String id) {
+        boolean flag = true;
+        int count = clueRemarkDao.deleteRemark(id);
+        if (count !=1){
+            flag = false;
+        }
+        return  flag;
+    }
 
 
 }

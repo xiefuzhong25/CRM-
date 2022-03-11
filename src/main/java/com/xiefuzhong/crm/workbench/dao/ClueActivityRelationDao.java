@@ -16,4 +16,8 @@ public interface ClueActivityRelationDao {
 
 
     int delete(ClueActivityRelation clueActivityRelation);
+
+    int getListCountByClueId(String[] ids);
+
+    int deleteClueAndActivityList(String[] ids);
 }
